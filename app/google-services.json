@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "28894550813",
+    "project_id": "notebyak",
+    "storage_bucket": "notebyak.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28894550813:android:54fe7ff18182e4cbbb5ff4",
+        "android_client_info": {
+          "package_name": "com.tvbykafi.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD59XK0cdjRZ6XQC1LSqnrw8EQxWa_mnGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
