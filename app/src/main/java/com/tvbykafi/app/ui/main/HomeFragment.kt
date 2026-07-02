@@ -104,7 +104,6 @@ class HomeFragment : Fragment(), MainActivity.UserUpdateListener {
 
         rvChannels.layoutManager = GridLayoutManager(context, spanCount)
         rvChannels.adapter = channelAdapter
-        rvChannels.setHasFixedSize(true)
         rvChannels.setItemViewCacheSize(20)
         rvChannels.recycledViewPool.setMaxRecycledViews(0, 30)
 
