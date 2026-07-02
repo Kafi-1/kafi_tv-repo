@@ -5,5 +5,6 @@ data class Channel(
     val name: String = "",
     val logo: String = "",
     val url: String = "",
-    val category: String = "General"
+    val category: String = "General",
+    val status: String = "live"
 )

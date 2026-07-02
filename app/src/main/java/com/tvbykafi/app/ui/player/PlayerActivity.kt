@@ -24,11 +24,7 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.dash.DashMediaSource
-import androidx.media3.exoplayer.rtsp.RtspMediaSource
-import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.tvbykafi.app.R
@@ -119,25 +115,28 @@ class PlayerActivity : AppCompatActivity() {
                 DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
                 DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
                 500,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+                2000
             )
             .build()
+
+        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(15000)
+            .setReadTimeoutMs(15000)
+            .setUserAgent("Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36")
+
+        val dataSourceFactory = DefaultDataSource.Factory(this, httpDataSourceFactory)
+        val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
 
         player = ExoPlayer.Builder(this)
             .setHandleAudioBecomingNoisy(true)
             .setLoadControl(loadControl)
+            .setMediaSourceFactory(mediaSourceFactory)
             .build()
             .apply {
                 playerView.player = this
 
-                val mediaSource = buildMediaSource(channelUrl)
-                if (mediaSource == null) {
-                    isInitializing = false
-                    showError(getString(R.string.error_stream))
-                    return
-                }
-
-                setMediaSource(mediaSource)
+                setMediaItem(MediaItem.fromUri(channelUrl))
                 prepare()
                 playWhenReady = true
 
@@ -194,43 +193,6 @@ class PlayerActivity : AppCompatActivity() {
                 initPlayer()
             }
         }, 2000L)
-    }
-
-    private fun buildMediaSource(url: String): MediaSource? {
-        if (url.isBlank()) return null
-
-        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(15000)
-            .setReadTimeoutMs(15000)
-            .setUserAgent("Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36")
-
-        val dataSourceFactory = DefaultDataSource.Factory(this, httpDataSourceFactory)
-        val mediaItem = MediaItem.fromUri(url)
-
-        val path = android.net.Uri.parse(url).path?.lowercase() ?: ""
-        val scheme = android.net.Uri.parse(url).scheme?.lowercase() ?: ""
-
-        return when {
-            scheme == "rtsp" -> {
-                RtspMediaSource.Factory()
-                    .createMediaSource(mediaItem)
-            }
-            path.endsWith(".m3u8") || path.contains("/hls/") -> {
-                HlsMediaSource.Factory(dataSourceFactory)
-                    .setAllowChunklessPreparation(true)
-                    .createMediaSource(mediaItem)
-            }
-            path.endsWith(".mpd") || path.contains("/dash/") -> {
-                DashMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(mediaItem)
-            }
-            else -> {
-                HlsMediaSource.Factory(dataSourceFactory)
-                    .setAllowChunklessPreparation(true)
-                    .createMediaSource(mediaItem)
-            }
-        }
     }
 
     private fun cycleAspectRatio() {

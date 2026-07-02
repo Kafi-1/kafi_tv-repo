@@ -57,6 +57,16 @@
     <string name="back_to_home">Back to Home</string>
     <string name="monthly_price_label">Monthly Price:</string>
     <string name="bdt">BDT</string>
+    <string name="bkash_label">bKash:</string>
+    <string name="nagad_label">Nagad:</string>
+    <string name="nav_payment">Payment</string>
+    <string name="payment_title">PAYMENT</string>
+    <string name="payment_instructions">নিচের নম্বরে টাকা পাঠান, তারপর Transaction ID দিয়ে Submit করুন।</string>
+    <string name="payment_history">Payment History</string>
+    <string name="no_payment_history">No payment history yet</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_rejected">Rejected</string>
     <string name="error_empty_email">Please enter your User ID / Email</string>
     <string name="error_empty_pin">Please enter your PIN</string>
     <string name="btn_logging_in">LOGGING IN…</string>

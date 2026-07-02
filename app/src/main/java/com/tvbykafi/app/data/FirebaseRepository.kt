@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.tvbykafi.app.data.model.AppConfig
 import com.tvbykafi.app.data.model.Channel
+import com.tvbykafi.app.data.model.PaymentRequest
 import com.tvbykafi.app.data.model.User
 
 class FirebaseRepository private constructor() {
@@ -122,7 +123,8 @@ class FirebaseRepository private constructor() {
                     name = d["name"] as? String ?: "",
                     logo = d["logo"] as? String ?: "",
                     url = d["url"] as? String ?: "",
-                    category = d["category"] as? String ?: "General"
+                    category = d["category"] as? String ?: "General",
+                    status = d["status"] as? String ?: "live"
                 )
             }
             onUpdate(list)
@@ -169,6 +171,26 @@ class FirebaseRepository private constructor() {
     }
 
     // =================== PAYMENT ===================
+
+    fun observeUserPayments(userId: String, onUpdate: (List<PaymentRequest>) -> Unit): ListenerRegistration {
+        return paymentCol.whereEqualTo("userId", userId)
+            .addSnapshotListener { snap, _ ->
+                if (snap == null) return@addSnapshotListener
+                val list = snap.documents.mapNotNull { doc ->
+                    val d = doc.data ?: return@mapNotNull null
+                    PaymentRequest(
+                        id = doc.id,
+                        userId = d["userId"] as? String ?: "",
+                        userName = d["userName"] as? String ?: "",
+                        number = d["number"] as? String ?: "",
+                        trxId = d["trxId"] as? String ?: "",
+                        status = d["status"] as? String ?: "Pending",
+                        timestamp = d["timestamp"] as? String ?: ""
+                    )
+                }.sortedByDescending { it.timestamp }
+                onUpdate(list)
+            }
+    }
 
     fun submitPayment(
         userId: String,

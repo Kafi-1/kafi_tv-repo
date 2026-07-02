@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_black"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:maxWidth="540dp"
+        android:layout_gravity="center_horizontal">
+
+        <!-- Payment Info Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/payment_title"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/payment_instructions"
+                android:textSize="@dimen/text_sm"
+                android:textColor="@color/text_hint"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tvPayPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_sm"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="12dp" />
+
+            <!-- bKash Number -->
+            <LinearLayout
+                android:id="@+id/payLayoutBkash"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_info_row"
+                android:padding="14dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="@string/bkash_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_sm" android:textStyle="bold" />
+                <TextView android:id="@+id/tvPayBkash" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textColor="@color/primary" android:textStyle="bold" android:textSize="@dimen/text_md" />
+            </LinearLayout>
+
+            <!-- Nagad Number -->
+            <LinearLayout
+                android:id="@+id/payLayoutNagad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_info_row"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="@string/nagad_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_sm" android:textStyle="bold" />
+                <TextView android:id="@+id/tvPayNagad" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textColor="@color/primary" android:textStyle="bold" android:textSize="@dimen/text_md" />
+            </LinearLayout>
+
+            <!-- Form -->
+            <EditText
+                android:id="@+id/etPayNumber"
+                style="@style/InputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_bkash_nagad"
+                android:inputType="phone"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
+
+            <EditText
+                android:id="@+id/etPayTrx"
+                style="@style/InputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/hint_trx_id"
+                android:inputType="text"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
+
+            <Button
+                android:id="@+id/btnSubmitPayment"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/btn_submit_request"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:background="@drawable/bg_btn_primary"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- Payment History -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="24dp"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/payment_history"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPayments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <TextView
+                android:id="@+id/tvNoPayments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_payment_history"
+                android:textColor="@color/text_hint"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:padding="24dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

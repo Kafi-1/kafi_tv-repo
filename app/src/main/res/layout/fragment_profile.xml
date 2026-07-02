@@ -129,7 +129,37 @@
                 android:textSize="@dimen/text_sm"
                 android:textColor="@color/text_hint"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="20dp" />
+                android:layout_marginBottom="12dp" />
+
+            <!-- bKash Number -->
+            <LinearLayout
+                android:id="@+id/layoutBkash"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_info_row"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="@string/bkash_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_sm" android:textStyle="bold" />
+                <TextView android:id="@+id/tvBkashNum" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textColor="@color/primary" android:textStyle="bold" android:textSize="@dimen/text_md" />
+            </LinearLayout>
+
+            <!-- Nagad Number -->
+            <LinearLayout
+                android:id="@+id/layoutNagad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_info_row"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="@string/nagad_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_sm" android:textStyle="bold" />
+                <TextView android:id="@+id/tvNagadNum" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textColor="@color/primary" android:textStyle="bold" android:textSize="@dimen/text_md" />
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/etPayNumber"

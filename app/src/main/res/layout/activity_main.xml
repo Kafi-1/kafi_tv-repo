@@ -217,6 +217,21 @@
                 android:background="?attr/selectableItemBackground"
                 android:padding="16dp"
                 android:focusable="true" />
+
+            <Button
+                android:id="@+id/navPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_payment"
+                android:drawableStart="@android:drawable/ic_menu_agenda"
+                android:drawablePadding="12dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textAlignment="textStart"
+                android:background="?attr/selectableItemBackground"
+                android:padding="16dp"
+                android:focusable="true" />
         </LinearLayout>
 
         <!-- Logout -->

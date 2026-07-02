@@ -25,6 +25,7 @@ class ChannelAdapter(
         val tvName: TextView = view.findViewById(R.id.tvChannelName)
         val btnFav: ImageButton = view.findViewById(R.id.btnFav)
         val channelBg: View = view.findViewById(R.id.channelBg)
+        val statusBadge: View = view.findViewById(R.id.statusBadge)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -57,6 +58,10 @@ class ChannelAdapter(
         )
 
         holder.itemView.setOnClickListener { onChannelClick(ch) }
+
+        holder.statusBadge.setBackgroundResource(
+            if (ch.status.lowercase() == "live") R.drawable.bg_dot_green else R.drawable.bg_dot_red
+        )
 
         if (isTV) {
             holder.btnFav.visibility = View.GONE

@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
             findViewById<View>(R.id.navWishlist),
             findViewById<View>(R.id.navProfile),
             findViewById<View>(R.id.navSupport),
+            findViewById<View>(R.id.navPayment),
             findViewById<View>(R.id.navLogout)
         )
 
@@ -93,6 +94,9 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.navSupport).setOnClickListener {
             showFragment(SupportFragment(), "support"); closeDrawer()
+        }
+        findViewById<View>(R.id.navPayment).setOnClickListener {
+            showFragment(PaymentFragment(), "payment"); closeDrawer()
         }
         findViewById<View>(R.id.navLogout).setOnClickListener {
             logout()

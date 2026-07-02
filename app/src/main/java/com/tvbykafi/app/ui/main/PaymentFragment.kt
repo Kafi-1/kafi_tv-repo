@@ -9,17 +9,22 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.ListenerRegistration
 import com.tvbykafi.app.R
 import com.tvbykafi.app.data.FirebaseRepository
 import com.tvbykafi.app.data.model.AppConfig
-import com.tvbykafi.app.data.model.User
+import com.tvbykafi.app.ui.adapter.PaymentAdapter
 
-class ProfileFragment : Fragment(), MainActivity.UserUpdateListener, MainActivity.ConfigUpdateListener {
+class PaymentFragment : Fragment(), MainActivity.ConfigUpdateListener {
 
     private val repo = FirebaseRepository.getInstance()
+    private var paymentListener: ListenerRegistration? = null
+    private lateinit var paymentAdapter: PaymentAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        return inflater.inflate(R.layout.fragment_payment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -28,39 +33,44 @@ class ProfileFragment : Fragment(), MainActivity.UserUpdateListener, MainActivit
         val mainActivity = activity as? MainActivity ?: return
         val user = mainActivity.currentUser ?: return
 
-        populateProfile(view, user)
+        mainActivity.appConfig?.let { updatePaymentInfo(view, it) }
 
-        mainActivity.appConfig?.let { populateConfig(view, it) }
+        paymentAdapter = PaymentAdapter()
+        val rvPayments = view.findViewById<RecyclerView>(R.id.rvPayments)
+        rvPayments.layoutManager = LinearLayoutManager(context)
+        rvPayments.adapter = paymentAdapter
+
+        paymentListener = repo.observeUserPayments(user.id) { payments ->
+            if (isAdded) {
+                activity?.runOnUiThread {
+                    paymentAdapter.submitList(payments)
+                    view.findViewById<View>(R.id.tvNoPayments).visibility =
+                        if (payments.isEmpty()) View.VISIBLE else View.GONE
+                }
+            }
+        }
 
         view.findViewById<Button>(R.id.btnSubmitPayment).setOnClickListener {
             submitPayment(view, user)
         }
     }
 
-    private fun populateProfile(view: View, user: User) {
-        view.findViewById<TextView>(R.id.tvAvatarLetter).text = user.name.take(1).uppercase()
-        view.findViewById<TextView>(R.id.tvProfileName).text = user.name
-        view.findViewById<TextView>(R.id.tvProfileEmail).text = user.email
-        view.findViewById<TextView>(R.id.tvProfilePin).text = "••••••"
-        view.findViewById<TextView>(R.id.tvProfileStart).text = user.start_at.ifEmpty { getString(R.string.label_na) }
-        view.findViewById<TextView>(R.id.tvProfileExpiry).text = user.expiry.ifEmpty { getString(R.string.label_na) }
-    }
-
-    private fun populateConfig(view: View, config: AppConfig) {
-        val priceText = "${getString(R.string.monthly_price_label)} ${config.monthly_price} ${getString(R.string.bdt)}"
-        view.findViewById<TextView>(R.id.tvMonthlyPrice).text = priceText
-
+    private fun updatePaymentInfo(view: View, config: AppConfig) {
+        if (config.monthly_price.isNotEmpty()) {
+            view.findViewById<TextView>(R.id.tvPayPrice).text =
+                "${getString(R.string.monthly_price_label)} ${config.monthly_price} ${getString(R.string.bdt)}"
+        }
         if (config.bkash_num.isNotEmpty()) {
-            view.findViewById<View>(R.id.layoutBkash).visibility = View.VISIBLE
-            view.findViewById<TextView>(R.id.tvBkashNum).text = config.bkash_num
+            view.findViewById<View>(R.id.payLayoutBkash).visibility = View.VISIBLE
+            view.findViewById<TextView>(R.id.tvPayBkash).text = config.bkash_num
         }
         if (config.nagad_num.isNotEmpty()) {
-            view.findViewById<View>(R.id.layoutNagad).visibility = View.VISIBLE
-            view.findViewById<TextView>(R.id.tvNagadNum).text = config.nagad_num
+            view.findViewById<View>(R.id.payLayoutNagad).visibility = View.VISIBLE
+            view.findViewById<TextView>(R.id.tvPayNagad).text = config.nagad_num
         }
     }
 
-    private fun submitPayment(view: View, user: User) {
+    private fun submitPayment(view: View, user: com.tvbykafi.app.data.model.User) {
         val etNumber = view.findViewById<EditText>(R.id.etPayNumber)
         val etTrx = view.findViewById<EditText>(R.id.etPayTrx)
         val btn = view.findViewById<Button>(R.id.btnSubmitPayment)
@@ -100,11 +110,12 @@ class ProfileFragment : Fragment(), MainActivity.UserUpdateListener, MainActivit
         )
     }
 
-    override fun onUserUpdated(user: User) {
-        view?.let { populateProfile(it, user) }
+    override fun onConfigUpdated(config: AppConfig) {
+        view?.let { updatePaymentInfo(it, config) }
     }
 
-    override fun onConfigUpdated(config: AppConfig) {
-        view?.let { populateConfig(it, config) }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        paymentListener?.remove()
     }
 }
