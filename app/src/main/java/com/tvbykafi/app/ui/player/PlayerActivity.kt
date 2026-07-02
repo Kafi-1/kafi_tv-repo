@@ -12,7 +12,6 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -77,7 +76,7 @@ class PlayerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvChannelName)?.text = channelName
         tvErrorMsg = findViewById(R.id.tvErrorMsg)
 
-        findViewById<Button>(R.id.btnRetry)?.setOnClickListener {
+        findViewById<View>(R.id.btnRetry)?.setOnClickListener {
             if (!NetworkUtil.isOnline(this)) {
                 showError(getString(R.string.no_internet))
                 return@setOnClickListener
@@ -88,13 +87,13 @@ class PlayerActivity : AppCompatActivity() {
             initPlayer()
         }
 
-        findViewById<Button>(R.id.btnBack)?.setOnClickListener { finish() }
+        findViewById<View>(R.id.btnBack)?.setOnClickListener { finish() }
 
-        findViewById<Button>(R.id.btnAspect)?.setOnClickListener {
+        findViewById<View>(R.id.btnAspect)?.setOnClickListener {
             cycleAspectRatio()
         }
 
-        findViewById<Button>(R.id.btnClosePlayer)?.setOnClickListener { finish() }
+        findViewById<View>(R.id.btnClosePlayer)?.setOnClickListener { finish() }
 
         if (channelUrl.isBlank()) {
             showError(getString(R.string.error_stream))
