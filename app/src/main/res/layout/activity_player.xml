@@ -64,12 +64,12 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Loading Spinner -->
+    <!-- Loading Spinner — transparent so video shows behind -->
     <LinearLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_overlay"
+        android:background="@color/transparent"
         android:gravity="center"
         android:orientation="vertical">
 

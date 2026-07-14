@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -71,6 +72,11 @@ class WishlistFragment : Fragment(), MainActivity.UserUpdateListener {
     }
 
     private fun playChannel(channel: Channel) {
+        val mainActivity = activity as? MainActivity ?: return
+        if (mainActivity.isSubscriptionExpired()) {
+            Toast.makeText(context, getString(R.string.subscription_expired), Toast.LENGTH_LONG).show()
+            return
+        }
         val index = favChannels.indexOfFirst { it.id == channel.id }
         ChannelHolder.channels = favChannels
         val intent = Intent(requireContext(), PlayerActivity::class.java).apply {

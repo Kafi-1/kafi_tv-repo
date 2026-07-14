@@ -28,6 +28,17 @@ class FirebaseRepository private constructor() {
     private val settingsDoc = db.document("settings/app_config")
     private val paymentCol = db.collection("payment_requests")
 
+    private var cachedChannels: List<Channel>? = null
+    private var cachedCategories: List<String>? = null
+    private var channelsCacheTime = 0L
+    private val cacheTtl = 5 * 60 * 1000L
+
+    fun clearCache() {
+        cachedChannels = null
+        cachedCategories = null
+        channelsCacheTime = 0L
+    }
+
     // =================== AUTH ===================
 
     fun login(
@@ -117,6 +128,12 @@ class FirebaseRepository private constructor() {
         onSuccess: (List<Channel>) -> Unit,
         onError: () -> Unit = {}
     ) {
+        val now = System.currentTimeMillis()
+        val cached = cachedChannels
+        if (cached != null && (now - channelsCacheTime) < cacheTtl) {
+            onSuccess(cached)
+            return
+        }
         channelsCol.get()
             .addOnSuccessListener { snap ->
                 val list = snap.documents.mapNotNull { doc ->
@@ -131,6 +148,8 @@ class FirebaseRepository private constructor() {
                         drmLicenseUrl = d["drm_license_url"] as? String ?: ""
                     )
                 }
+                cachedChannels = list
+                channelsCacheTime = System.currentTimeMillis()
                 onSuccess(list)
             }
             .addOnFailureListener { onError() }
@@ -162,9 +181,16 @@ class FirebaseRepository private constructor() {
         onSuccess: (List<String>) -> Unit,
         onError: () -> Unit = {}
     ) {
+        val cached = cachedCategories
+        val now = System.currentTimeMillis()
+        if (cached != null && (now - channelsCacheTime) < cacheTtl) {
+            onSuccess(cached)
+            return
+        }
         categoriesCol.get()
             .addOnSuccessListener { snap ->
                 val cats = snap.documents.mapNotNull { it.data?.get("name") as? String }
+                cachedCategories = cats
                 onSuccess(cats)
             }
             .addOnFailureListener { onError() }

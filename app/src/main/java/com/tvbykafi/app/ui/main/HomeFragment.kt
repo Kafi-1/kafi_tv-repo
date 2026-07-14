@@ -77,6 +77,7 @@ class HomeFragment : Fragment(), MainActivity.UserUpdateListener {
 
         swipeRefresh.setColorSchemeResources(R.color.primary)
         swipeRefresh.setOnRefreshListener {
+            repo.clearCache()
             loadData()
         }
 
@@ -169,6 +170,11 @@ class HomeFragment : Fragment(), MainActivity.UserUpdateListener {
     }
 
     private fun playChannel(channel: Channel) {
+        val mainActivity = activity as? MainActivity ?: return
+        if (mainActivity.isSubscriptionExpired()) {
+            checkExpiry(mainActivity)
+            return
+        }
         val index = currentFilteredList.indexOfFirst { it.id == channel.id }
         ChannelHolder.channels = currentFilteredList
         val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
