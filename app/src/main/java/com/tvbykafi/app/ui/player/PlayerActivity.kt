@@ -34,7 +34,9 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.bumptech.glide.Glide
 import com.tvbykafi.app.R
+import com.tvbykafi.app.data.ChannelHolder
 import com.tvbykafi.app.data.model.Channel
+import com.tvbykafi.app.util.DeviceUtils
 import com.tvbykafi.app.util.NetworkUtil
 import kotlin.math.abs
 
@@ -62,11 +64,10 @@ class PlayerActivity : AppCompatActivity() {
     private var useSoftwareDecoder = false
     private lateinit var tvErrorMsg: TextView
 
-    // Channel list for swipe navigation
     private var channelList = arrayListOf<Channel>()
     private var currentChannelIndex = 0
 
-    private lateinit var gestureDetector: GestureDetector
+    private var gestureDetector: GestureDetector? = null
 
     private val resizeModes = intArrayOf(
         AspectRatioFrameLayout.RESIZE_MODE_FIT,
@@ -77,19 +78,21 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hideSystemUI()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContentView(R.layout.activity_player)
+
+        hideSystemUI()
 
         channelName = intent.getStringExtra("channel_name") ?: ""
         channelUrl = intent.getStringExtra("channel_url") ?: ""
         channelDrmUrl = intent.getStringExtra("channel_drm_url") ?: ""
 
-        // Get channel list for swipe navigation
-        @Suppress("DEPRECATION")
-        channelList = intent.getParcelableArrayListExtra("channel_list") ?: arrayListOf()
+        channelList = ArrayList(ChannelHolder.channels)
         currentChannelIndex = intent.getIntExtra("channel_index", 0)
+        if (currentChannelIndex < 0 || currentChannelIndex >= channelList.size) {
+            currentChannelIndex = 0
+        }
 
         playerView = findViewById(R.id.playerView)
         loadingOverlay = findViewById(R.id.loadingOverlay)
@@ -123,8 +126,9 @@ class PlayerActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.btnClosePlayer)?.setOnClickListener { finish() }
 
-        // Setup touch swipe gesture for phones
-        setupGestureDetector()
+        if (!DeviceUtils.isTV(this)) {
+            setupGestureDetector()
+        }
 
         if (channelUrl.isBlank()) {
             showError(getString(R.string.error_stream))
@@ -160,10 +164,8 @@ class PlayerActivity : AppCompatActivity() {
                     abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
                 ) {
                     if (diffX < 0) {
-                        // Swipe LEFT → next channel
                         switchChannel(1)
                     } else {
-                        // Swipe RIGHT → previous channel
                         switchChannel(-1)
                     }
                     return true
@@ -182,8 +184,7 @@ class PlayerActivity : AppCompatActivity() {
         })
 
         playerView.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            true
+            gestureDetector?.onTouchEvent(event) ?: false
         }
     }
 
@@ -204,16 +205,14 @@ class PlayerActivity : AppCompatActivity() {
         channelUrl = channel.url
         channelDrmUrl = channel.drmLicenseUrl
 
-        // Update UI
         findViewById<TextView>(R.id.tvLoadingChannel).text = channelName
         findViewById<TextView>(R.id.tvChannelName)?.text = channelName
 
-        // Show channel info overlay
         showChannelInfo(channel)
 
-        // Reset state and play new channel
         retryCount = 0
         useSoftwareDecoder = false
+        retryHandler.removeCallbacksAndMessages(null)
         loadingOverlay.visibility = View.VISIBLE
         errorOverlay.visibility = View.GONE
 
@@ -221,41 +220,48 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun showChannelInfo(channel: Channel) {
+        if (isFinishing || isDestroyed) return
+
         tvChannelInfoName.text = channel.name
         tvChannelInfoCategory.text = channel.category.uppercase()
 
-        Glide.with(this)
-            .load(channel.logo)
-            .placeholder(R.drawable.ic_tv_default)
-            .error(R.drawable.ic_tv_default)
-            .circleCrop()
-            .into(ivChannelLogoOverlay)
+        try {
+            Glide.with(applicationContext)
+                .load(channel.logo)
+                .placeholder(R.drawable.ic_tv_default)
+                .error(R.drawable.ic_tv_default)
+                .circleCrop()
+                .into(ivChannelLogoOverlay)
+        } catch (_: Exception) {}
 
         channelInfoOverlay.visibility = View.VISIBLE
+        channelInfoOverlay.alpha = 1f
 
         infoHandler.removeCallbacksAndMessages(null)
         infoHandler.postDelayed({
-            channelInfoOverlay.animate()
-                .alpha(0f)
-                .setDuration(300)
-                .withEndAction {
-                    channelInfoOverlay.visibility = View.GONE
-                    channelInfoOverlay.alpha = 1f
-                }
-                .start()
+            if (!isFinishing && !isDestroyed) {
+                channelInfoOverlay.animate()
+                    .alpha(0f)
+                    .setDuration(300)
+                    .withEndAction {
+                        channelInfoOverlay.visibility = View.GONE
+                        channelInfoOverlay.alpha = 1f
+                    }
+                    .start()
+            }
         }, 3000)
     }
 
     private fun initPlayer() {
+        if (isFinishing || isDestroyed) return
         if (isInitializing) return
         isInitializing = true
 
         releasePlayer()
 
         try {
-            // Optimized buffer — reduces black screen delay
             val loadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(2500, 20000, 500, 1000)
+                .setBufferDurationsMs(5000, 30000, 1000, 2000)
                 .setPrioritizeTimeOverSizeThresholds(true)
                 .build()
 
@@ -268,84 +274,80 @@ class PlayerActivity : AppCompatActivity() {
             val dataSourceFactory = DefaultDataSource.Factory(this, httpDataSourceFactory)
             val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
 
-            // Software decoder fallback — fixes crash on TV boxes and weak phones
             val renderersFactory = DefaultRenderersFactory(this).apply {
-                setExtensionRendererMode(
-                    if (useSoftwareDecoder) {
-                        DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
-                    } else {
-                        DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
-                    }
-                )
+                if (useSoftwareDecoder) {
+                    setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
+                } else {
+                    setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF)
+                }
                 setEnableDecoderFallback(true)
             }
 
-            // Build MediaItem — with or without DRM
             val mediaItem = buildMediaItem()
 
-            player = ExoPlayer.Builder(this)
+            val newPlayer = ExoPlayer.Builder(this)
                 .setRenderersFactory(renderersFactory)
                 .setHandleAudioBecomingNoisy(true)
                 .setLoadControl(loadControl)
                 .setMediaSourceFactory(mediaSourceFactory)
                 .build()
-                .apply {
-                    playerView.player = this
 
-                    setMediaItem(mediaItem)
-                    prepare()
-                    playWhenReady = true
-
-                    addListener(object : Player.Listener {
-                        override fun onPlaybackStateChanged(state: Int) {
-                            when (state) {
-                                Player.STATE_READY -> {
-                                    loadingOverlay.visibility = View.GONE
-                                    errorOverlay.visibility = View.GONE
-                                    retryCount = 0
-                                    isInitializing = false
-                                }
-                                Player.STATE_BUFFERING -> {
-                                    loadingOverlay.visibility = View.VISIBLE
-                                }
-                                Player.STATE_ENDED -> {
-                                    loadingOverlay.visibility = View.GONE
-                                    isInitializing = false
-                                }
-                            }
+            newPlayer.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(state: Int) {
+                    if (isFinishing || isDestroyed) return
+                    when (state) {
+                        Player.STATE_READY -> {
+                            loadingOverlay.visibility = View.GONE
+                            errorOverlay.visibility = View.GONE
+                            retryCount = 0
+                            isInitializing = false
                         }
-
-                        override fun onPlayerError(error: PlaybackException) {
+                        Player.STATE_BUFFERING -> {
+                            loadingOverlay.visibility = View.VISIBLE
+                        }
+                        Player.STATE_ENDED -> {
                             loadingOverlay.visibility = View.GONE
                             isInitializing = false
-
-                            val isDecoderError =
-                                error.errorCode == PlaybackException.ERROR_CODE_DECODER_INIT_FAILED
-                                    || error.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED
-                                    || error.errorCode == PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED
-
-                            when {
-                                // Decoder error — retry with software decoder
-                                isDecoderError && !useSoftwareDecoder -> {
-                                    useSoftwareDecoder = true
-                                    retryCount = 0
-                                    retryWithDelay()
-                                }
-                                !NetworkUtil.isOnline(this@PlayerActivity) -> {
-                                    showError(getString(R.string.no_internet))
-                                }
-                                retryCount < maxRetries -> {
-                                    retryWithDelay()
-                                }
-                                else -> {
-                                    showError(getString(R.string.stream_source_error))
-                                    retryCount = 0
-                                }
-                            }
                         }
-                    })
+                    }
                 }
 
+                override fun onPlayerError(error: PlaybackException) {
+                    if (isFinishing || isDestroyed) return
+                    loadingOverlay.visibility = View.GONE
+                    isInitializing = false
+
+                    val isDecoderError =
+                        error.errorCode == PlaybackException.ERROR_CODE_DECODER_INIT_FAILED
+                            || error.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED
+                            || error.errorCode == PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED
+
+                    when {
+                        isDecoderError && !useSoftwareDecoder -> {
+                            useSoftwareDecoder = true
+                            retryCount = 0
+                            retryWithDelay()
+                        }
+                        !NetworkUtil.isOnline(this@PlayerActivity) -> {
+                            showError(getString(R.string.no_internet))
+                        }
+                        retryCount < maxRetries -> {
+                            retryWithDelay()
+                        }
+                        else -> {
+                            showError(getString(R.string.stream_source_error))
+                            retryCount = 0
+                        }
+                    }
+                }
+            })
+
+            newPlayer.setMediaItem(mediaItem)
+            newPlayer.prepare()
+            newPlayer.playWhenReady = true
+
+            playerView.player = newPlayer
+            player = newPlayer
             isInitializing = false
         } catch (e: Exception) {
             isInitializing = false
@@ -356,7 +358,6 @@ class PlayerActivity : AppCompatActivity() {
     private fun buildMediaItem(): MediaItem {
         val builder = MediaItem.Builder().setUri(channelUrl)
 
-        // DRM configuration
         if (channelDrmUrl.isNotEmpty()) {
             builder.setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
@@ -365,7 +366,6 @@ class PlayerActivity : AppCompatActivity() {
             )
         }
 
-        // Detect stream type from URL for better compatibility
         val lowerUrl = channelUrl.lowercase()
         when {
             lowerUrl.contains(".m3u8") || lowerUrl.contains("/hls") -> {
@@ -384,6 +384,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun retryWithDelay() {
         retryCount++
+        retryHandler.removeCallbacksAndMessages(null)
         retryHandler.postDelayed({
             if (!isFinishing && !isDestroyed) {
                 loadingOverlay.visibility = View.VISIBLE
@@ -407,7 +408,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        // If player controls are visible, let the default handling work
         if (playerView.isControllerFullyVisible) {
             return super.onKeyDown(keyCode, event)
         }
@@ -417,7 +417,6 @@ class PlayerActivity : AppCompatActivity() {
                 playerView.showController()
                 true
             }
-            // DPAD LEFT/RIGHT — Televizio-style channel switching
             KeyEvent.KEYCODE_DPAD_LEFT -> {
                 switchChannel(-1)
                 true
@@ -453,7 +452,6 @@ class PlayerActivity : AppCompatActivity() {
                 finish()
                 true
             }
-            // Channel up/down buttons on some remotes
             KeyEvent.KEYCODE_CHANNEL_UP -> {
                 switchChannel(1)
                 true
@@ -470,10 +468,15 @@ class PlayerActivity : AppCompatActivity() {
         super.onUserLeaveHint()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && player?.isPlaying == true) {
             try {
-                val params = PictureInPictureParams.Builder()
-                    .setAspectRatio(Rational(16, 9))
-                    .build()
-                enterPictureInPictureMode(params)
+                val hasPip = packageManager.hasSystemFeature(
+                    android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE
+                )
+                if (hasPip) {
+                    val params = PictureInPictureParams.Builder()
+                        .setAspectRatio(Rational(16, 9))
+                        .build()
+                    enterPictureInPictureMode(params)
+                }
             } catch (_: Exception) {}
         }
     }
@@ -484,30 +487,34 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun hideSystemUI() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.let {
-                it.hide(WindowInsets.Type.systemBars())
-                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.insetsController?.let {
+                    it.hide(WindowInsets.Type.systemBars())
+                    it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                )
             }
-        } else {
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            )
-        }
+        } catch (_: Exception) {}
     }
 
     override fun onResume() {
         super.onResume()
         hideSystemUI()
-        // Only resume if player is in a valid state
         player?.let {
-            if (it.playbackState != Player.STATE_IDLE && it.playerError == null) {
+            if (it.playbackState != Player.STATE_IDLE &&
+                it.playbackState != Player.STATE_ENDED &&
+                it.playerError == null
+            ) {
                 it.play()
             }
         }
@@ -526,13 +533,14 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         retryHandler.removeCallbacksAndMessages(null)
         infoHandler.removeCallbacksAndMessages(null)
         releasePlayer()
+        super.onDestroy()
     }
 
     private fun showError(message: String) {
+        if (isFinishing || isDestroyed) return
         loadingOverlay.visibility = View.GONE
         tvErrorMsg.text = message
         errorOverlay.visibility = View.VISIBLE
@@ -540,6 +548,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun releasePlayer() {
         player?.let {
+            playerView.player = null
             it.stop()
             it.release()
         }

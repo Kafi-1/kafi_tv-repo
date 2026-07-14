@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tvbykafi.app.R
+import com.tvbykafi.app.data.ChannelHolder
 import com.tvbykafi.app.data.FirebaseRepository
 import com.tvbykafi.app.data.model.Channel
 import com.tvbykafi.app.data.model.User
@@ -71,11 +72,11 @@ class WishlistFragment : Fragment(), MainActivity.UserUpdateListener {
 
     private fun playChannel(channel: Channel) {
         val index = favChannels.indexOfFirst { it.id == channel.id }
+        ChannelHolder.channels = favChannels
         val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
             putExtra("channel_name", channel.name)
             putExtra("channel_url", channel.url)
             putExtra("channel_drm_url", channel.drmLicenseUrl)
-            putParcelableArrayListExtra("channel_list", ArrayList(favChannels))
             putExtra("channel_index", if (index >= 0) index else 0)
         }
         startActivity(intent)
