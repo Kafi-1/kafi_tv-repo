@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(command -v java)",
+      "Bash(command -v gradle)",
+      "Read(//data/data/com.termux/files/usr/bin/**)",
+      "Bash(pkg list-installed *)",
+      "Bash(pkg install *)",
+      "Bash(apt-get update *)",
+      "Bash(java *)",
+      "Bash(chmod +x gradlew)"
+    ]
+  }
+}

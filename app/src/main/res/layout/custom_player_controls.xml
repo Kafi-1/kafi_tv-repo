@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_black"
+    android:gravity="center">
+
+    <!-- Top Info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_revert"
+            android:contentDescription="Back"
+            android:focusable="true"
+            android:nextFocusRight="@id/btnAspect" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvChannelName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/live_hd_stream"
+                android:textColor="@color/primary"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.15" />
+        </LinearLayout>
+
+        <!-- Aspect Ratio Button -->
+        <Button
+            android:id="@+id/btnAspect"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/btn_size"
+            android:textColor="@color/text_primary"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:background="@drawable/bg_chip"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="8dp"
+            android:focusable="true"
+            android:nextFocusLeft="@id/btnBack"
+            android:nextFocusRight="@id/btnClosePlayer" />
+
+        <Button
+            android:id="@+id/btnClosePlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/btn_close"
+            android:textColor="@color/text_primary"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:background="@drawable/bg_btn_primary"
+            android:paddingHorizontal="16dp"
+            android:focusable="true"
+            android:nextFocusLeft="@id/btnAspect" />
+    </LinearLayout>
+</LinearLayout>

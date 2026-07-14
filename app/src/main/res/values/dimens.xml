@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+
+    <dimen name="corner_sm">8dp</dimen>
+    <dimen name="corner_md">16dp</dimen>
+    <dimen name="corner_lg">24dp</dimen>
+    <dimen name="corner_xl">30dp</dimen>
+    <dimen name="corner_full">50dp</dimen>
+
+    <dimen name="channel_icon_size">95dp</dimen>
+    <dimen name="channel_card_width">105dp</dimen>
+    <dimen name="channel_icon_border">2dp</dimen>
+
+    <dimen name="text_xs">10sp</dimen>
+    <dimen name="text_sm">12sp</dimen>
+    <dimen name="text_md">14sp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">24sp</dimen>
+    <dimen name="text_xxl">30sp</dimen>
+
+    <dimen name="header_height">60dp</dimen>
+    <dimen name="sidebar_width">260dp</dimen>
+
+    <!-- TV specific -->
+    <dimen name="tv_channel_icon_size">120dp</dimen>
+    <dimen name="tv_channel_card_width">140dp</dimen>
+    <dimen name="tv_focus_border">4dp</dimen>
+</resources>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TV BY KAFI</string>
+    <string name="login_title">LOGIN</string>
+    <string name="hint_user_id">User ID / Email</string>
+    <string name="hint_pin">6-Digit PIN</string>
+    <string name="btn_start_streaming">START STREAMING</string>
+    <string name="btn_authenticating">AUTHENTICATING…</string>
+    <string name="error_invalid_credentials">Invalid Credentials!</string>
+    <string name="error_device_limit">Device Limit Reached! Contact admin to reset devices.</string>
+    <string name="error_stream">Stream Error: This channel is currently offline.</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_wishlist">Wishlist</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_support">Support</string>
+    <string name="nav_logout">Log Out</string>
+
+    <string name="search_hint">Search channels…</string>
+    <string name="category_all">ALL</string>
+    <string name="live_hd_stream">LIVE HD STREAM</string>
+    <string name="btn_size">Size</string>
+    <string name="btn_close">Close</string>
+
+    <string name="subscription_ends">Subscription Ends</string>
+    <string name="checking">Checking…</string>
+    <string name="no_limit">No Limit</string>
+    <string name="subscription_expired">Subscription Expired!</string>
+    <string name="default_expire_msg">আপনার মেয়াদের শেষ হয়েছে, অনুগ্রহ করে রিচার্জ করুন।</string>
+    <string name="btn_renew_now">Renew Now</string>
+
+    <string name="profile_title">User Profile</string>
+    <string name="label_pin_access">PIN Access:</string>
+    <string name="label_join_date">Join Date:</string>
+    <string name="label_expiry_date">Expiry Date:</string>
+    <string name="label_na">N/A</string>
+
+    <string name="renew_title">RENEW SUBSCRIPTION</string>
+    <string name="hint_bkash_nagad">Bkash/Nagad Number</string>
+    <string name="hint_trx_id">Transaction ID (TrxID)</string>
+    <string name="btn_submit_request">SUBMIT REQUEST</string>
+    <string name="btn_submitting">SUBMITTING…</string>
+    <string name="payment_success">Request Sent! Please wait for admin approval.</string>
+    <string name="payment_error">Error sending request.</string>
+
+    <string name="support_title">Customer Support</string>
+    <string name="support_desc">আপনার যদি কোনো সমস্যা হয় তবে নিচের মাধ্যমে আমাদের সাথে যোগাযোগ করুন।</string>
+    <string name="whatsapp_support">WhatsApp Support</string>
+    <string name="telegram_channel">Telegram Channel</string>
+    <string name="chat_now">Chat Now</string>
+    <string name="join_us">Join Us</string>
+    <string name="email_label">Email Address</string>
+
+    <string name="your_wishlist">YOUR WISHLIST</string>
+    <string name="no_channels">No channels found</string>
+    <string name="no_favorites">No favorites yet</string>
+    <string name="back_to_home">Back to Home</string>
+    <string name="monthly_price_label">Monthly Price:</string>
+    <string name="bdt">BDT</string>
+    <string name="bkash_label">bKash:</string>
+    <string name="nagad_label">Nagad:</string>
+    <string name="nav_payment">Payment</string>
+    <string name="payment_title">PAYMENT</string>
+    <string name="payment_instructions">নিচের নম্বরে টাকা পাঠান, তারপর Transaction ID দিয়ে Submit করুন।</string>
+    <string name="payment_history">Payment History</string>
+    <string name="no_payment_history">No payment history yet</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_rejected">Rejected</string>
+    <string name="error_empty_email">Please enter your User ID / Email</string>
+    <string name="error_empty_pin">Please enter your PIN</string>
+    <string name="btn_logging_in">LOGGING IN…</string>
+
+    <string name="no_internet">No Internet Connection</string>
+    <string name="no_internet_desc">Please check your WiFi or mobile data and try again.</string>
+    <string name="btn_retry">Retry</string>
+    <string name="stream_codec_error">This channel format is not supported on your device.</string>
+    <string name="stream_timeout">Stream timed out. Please try again.</string>
+    <string name="stream_source_error">This channel is currently unavailable.</string>
+    <string name="switching_channel">Switching…</string>
+    <string name="decoder_retry">Retrying with software decoder…</string>
+    <string name="swipe_hint">Swipe left/right to switch channels</string>
+</resources>
