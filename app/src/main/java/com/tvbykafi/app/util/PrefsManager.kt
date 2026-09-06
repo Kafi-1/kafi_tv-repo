@@ -8,6 +8,7 @@ object PrefsManager {
     private const val PREFS_NAME = "iptv_prefs"
     private const val KEY_USER_ID = "user_doc_id"
     private const val KEY_DEVICE_ID = "device_id"
+    private const val KEY_LAST_CHANNEL = "last_channel_chno"
 
     private fun prefs(ctx: Context): SharedPreferences =
         ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -32,4 +33,11 @@ object PrefsManager {
         }
         return id
     }
+
+    fun saveLastChannel(ctx: Context, chno: Int) {
+        prefs(ctx).edit().putInt(KEY_LAST_CHANNEL, chno).apply()
+    }
+
+    fun getLastChannel(ctx: Context): Int =
+        prefs(ctx).getInt(KEY_LAST_CHANNEL, -1)
 }

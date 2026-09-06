@@ -16,7 +16,10 @@ import com.tvbykafi.app.util.DeviceUtils
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        FirebaseApp.initializeApp(this)
+        try {
+            FirebaseApp.initializeApp(this)
+        } catch (_: Exception) {
+        }
     }
 
     override fun onTrimMemory(level: Int) {

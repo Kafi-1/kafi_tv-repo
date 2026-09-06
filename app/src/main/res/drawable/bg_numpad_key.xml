@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/bg_card_elevated" />
+            <corners android:radius="@dimen/corner_md" />
+            <stroke android:width="@dimen/tv_focus_border" android:color="@color/accent_orange" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/bg_card_elevated" />
+            <corners android:radius="@dimen/corner_md" />
+            <stroke android:width="@dimen/tv_focus_border" android:color="@color/accent_orange" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/bg_card" />
+            <corners android:radius="@dimen/corner_md" />
+            <stroke android:width="1dp" android:color="@color/border_dark" />
+        </shape>
+    </item>
+</selector>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TV BY KAFI</string>
+    <string name="app_name">Kafi TV</string>
     <string name="login_title">LOGIN</string>
     <string name="hint_user_id">User ID / Email</string>
     <string name="hint_pin">6-Digit PIN</string>
@@ -80,4 +80,27 @@
     <string name="switching_channel">Switching…</string>
     <string name="decoder_retry">Retrying with software decoder…</string>
     <string name="swipe_hint">Swipe left/right to switch channels</string>
+
+    <!-- TV v2.0 New Strings -->
+    <string name="loading_playlist">Loading channels…</string>
+    <string name="error_empty_playlist">No channels found in playlist.</string>
+    <string name="error_load_playlist">Failed to load playlist. Please check your connection.</string>
+    <string name="retrying">Retrying…</string>
+    <string name="error_auto_retry">Auto-retrying connection…</string>
+    <string name="playlist_title">CHANNELS</string>
+    <string name="search_hint_playlist">Search name or number…</string>
+    <string name="press_back_to_close">Press BACK to close</string>
+    <string name="menu_refresh_playlist">Refresh Playlist</string>
+
+    <!-- On-screen Numpad -->
+    <string name="numpad_title">Channel Number</string>
+    <string name="numpad_hint">Number likhun, GO chapun</string>
+    <string name="numpad_del">DEL</string>
+    <string name="numpad_go">GO</string>
+    <string name="channel_not_found">Channel পাওয়া যায়নি!</string>
+    <string name="volume_hold_hint">Numpad খুলছে…</string>
+
+    <!-- Expiry Soon Notice -->
+    <string name="expiry_soon_today">আপনার সাবস্ক্রিপশন আজই শেষ হচ্ছে! রিনিউ করুন।</string>
+    <string name="expiry_soon_days">আপনার সাবস্ক্রিপশনের মেয়াদ %1$d দিন বাকি আছে। অনুগ্রহ করে রিনিউ করুন।</string>
 </resources>

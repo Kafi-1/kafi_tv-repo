@@ -12,15 +12,15 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher_legacy"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:banner="@drawable/ic_launcher_legacy"
+        android:banner="@drawable/ic_kafi_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="34">
 
-        <!-- Main Login Activity -->
+        <!-- Login Activity -->
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="true"
@@ -30,26 +30,24 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- TV Launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Main Home Activity -->
+        <!-- Main Home Activity (kept for compatibility) -->
         <activity
             android:name=".ui.main.MainActivity"
             android:screenOrientation="unspecified"
             android:launchMode="singleTop" />
 
-        <!-- ExoPlayer Activity -->
+        <!-- Player Activity (Main TV Screen) -->
         <activity
             android:name=".ui.player.PlayerActivity"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/AppTheme.Player"
-            android:supportsPictureInPicture="true"
             android:launchMode="singleTop" />
 
     </application>

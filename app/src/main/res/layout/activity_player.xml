@@ -10,72 +10,171 @@
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:show_buffering="when_playing"
-        app:use_controller="true"
-        app:controller_layout_id="@layout/custom_player_controls"
-        app:resize_mode="fit"
-        app:hide_on_touch="true"
-        app:show_timeout="3000" />
+        app:show_buffering="never"
+        app:use_controller="false"
+        app:resize_mode="fit" />
 
-    <!-- Channel Info Overlay (shown on swipe/switch) -->
+    <!-- Channel Info Overlay (top-left, shown on channel switch) -->
     <LinearLayout
         android:id="@+id/channelInfoOverlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|start"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/bg_card"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="10dp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="14dp"
         android:visibility="gone">
 
         <ImageView
             android:id="@+id/ivChannelLogoOverlay"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_tv_default"
             android:contentDescription="Channel Logo" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="14dp"
             android:orientation="vertical">
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvInfoChno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:background="@drawable/bg_dot_green" />
+
+                <TextView
+                    android:id="@+id/tvInfoCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_hint"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.1" />
+            </LinearLayout>
+
             <TextView
-                android:id="@+id/tvChannelInfoName"
+                android:id="@+id/tvInfoName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
 
             <TextView
-                android:id="@+id/tvChannelInfoCategory"
+                android:id="@+id/tvInfoTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/primary"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1" />
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Loading Spinner — transparent so video shows behind -->
+    <!-- DTH Number Input Overlay (top-right) -->
+    <LinearLayout
+        android:id="@+id/numberInputOverlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/bg_card"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CH"
+            android:textColor="@color/text_hint"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tvNumberInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:minWidth="80dp"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- Fast Browse Overlay (center, shown during long press channel scroll) -->
+    <LinearLayout
+        android:id="@+id/fastBrowseOverlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_card"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="40dp"
+        android:paddingVertical="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvBrowseChno"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvBrowseName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:maxWidth="300dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <!-- Loading Spinner -->
     <LinearLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <ProgressBar
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:indeterminateTint="@color/primary" />
 
         <TextView
@@ -83,9 +182,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_md"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="10dp" />
     </LinearLayout>
 
     <!-- Error Overlay -->
@@ -109,15 +208,459 @@
             android:gravity="center"
             android:paddingHorizontal="24dp" />
 
-        <Button
-            android:id="@+id/btnRetry"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Retry"
-            android:textColor="@color/text_primary"
-            android:background="@drawable/bg_btn_primary"
-            android:paddingHorizontal="32dp"
-            android:layout_marginTop="16dp"
+            android:text="@string/error_auto_retry"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- Playlist Overlay (full screen, semi-transparent) -->
+    <FrameLayout
+        android:id="@+id/playlistOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E6000000"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="24dp">
+
+            <!-- Playlist Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/playlist_title"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etPlaylistSearch"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_input"
+                    android:hint="@string/search_hint_playlist"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="14dp"
+                    android:singleLine="true"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Category Tabs -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPlaylistCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:clipToPadding="false" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/border_dark" />
+
+            <!-- Channel List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPlaylistChannels"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingVertical="8dp" />
+
+            <!-- Playlist Footer (channel count) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="10dp"
+                android:background="@color/bg_dark">
+
+                <TextView
+                    android:id="@+id/tvChannelCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/text_hint"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/press_back_to_close"
+                    android:textColor="@color/text_hint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Settings Menu Overlay (slide from left) -->
+    <LinearLayout
+        android:id="@+id/settingsOverlay"
+        android:layout_width="320dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/bg_dark"
+        android:orientation="vertical"
+        android:paddingTop="32dp"
+        android:elevation="8dp"
+        android:visibility="gone">
+
+        <!-- App Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/primary"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="8dp" />
+
+        <!-- User Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="16dp"
+            android:background="@color/bg_card">
+
+            <TextView
+                android:id="@+id/tvSettingsUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSettingsEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:layout_marginTop="2dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/subscription_ends"
+                    android:textColor="@color/text_hint"
+                    android:textSize="11sp"
+                    android:textAllCaps="true" />
+
+                <TextView
+                    android:id="@+id/tvSettingsExpiry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/accent_green"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Menu Items -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
+
+            <Button
+                android:id="@+id/btnSettingsRefresh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_refresh_playlist"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textAlignment="textStart"
+                android:background="?attr/selectableItemBackground"
+                android:padding="18dp"
+                android:focusable="true" />
+
+            <Button
+                android:id="@+id/btnSettingsPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_payment"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textAlignment="textStart"
+                android:background="?attr/selectableItemBackground"
+                android:padding="18dp"
+                android:focusable="true" />
+
+            <Button
+                android:id="@+id/btnSettingsSupport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_support"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textAlignment="textStart"
+                android:background="?attr/selectableItemBackground"
+                android:padding="18dp"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- Logout -->
+        <Button
+            android:id="@+id/btnSettingsLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_logout"
+            android:textColor="@color/primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textAlignment="textStart"
+            android:background="?attr/selectableItemBackground"
+            android:padding="20dp"
             android:focusable="true" />
     </LinearLayout>
+
+    <!-- Subscription Expiry-Soon Notice (top center, transparent) -->
+    <LinearLayout
+        android:id="@+id/expirySoonNotice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="24dp"
+        android:background="#B3000000"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="12dp"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_dot_orange" />
+
+        <TextView
+            android:id="@+id/tvExpirySoon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="520dp"
+            android:textColor="@color/accent_orange"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Volume-Hold Hint (bottom center, yellow) -->
+    <TextView
+        android:id="@+id/tvVolumeHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/bg_hint_yellow"
+        android:text="@string/volume_hold_hint"
+        android:textColor="@color/bg_black"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:visibility="gone" />
+
+    <!-- Channel Not Found Overlay (center toast) -->
+    <TextView
+        android:id="@+id/tvNotFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_card"
+        android:text="@string/channel_not_found"
+        android:textColor="@color/text_error"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="20dp"
+        android:visibility="gone" />
+
+    <!-- On-Screen Numpad Overlay (full-screen dim + centered pad) -->
+    <FrameLayout
+        android:id="@+id/numpadOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/numpad_title"
+                android:textColor="@color/text_hint"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.1" />
+
+            <!-- Display -->
+            <TextView
+                android:id="@+id/tvNumpadDisplay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_input"
+                android:gravity="center"
+                android:minHeight="56dp"
+                android:paddingHorizontal="16dp"
+                android:text=""
+                android:textColor="@color/accent_orange"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <!-- Row 1: 1 2 3 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnNum1"
+                    style="@style/NumpadKey"
+                    android:text="1" />
+
+                <Button
+                    android:id="@+id/btnNum2"
+                    style="@style/NumpadKey"
+                    android:text="2" />
+
+                <Button
+                    android:id="@+id/btnNum3"
+                    style="@style/NumpadKey"
+                    android:text="3" />
+            </LinearLayout>
+
+            <!-- Row 2: 4 5 6 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnNum4"
+                    style="@style/NumpadKey"
+                    android:text="4" />
+
+                <Button
+                    android:id="@+id/btnNum5"
+                    style="@style/NumpadKey"
+                    android:text="5" />
+
+                <Button
+                    android:id="@+id/btnNum6"
+                    style="@style/NumpadKey"
+                    android:text="6" />
+            </LinearLayout>
+
+            <!-- Row 3: 7 8 9 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnNum7"
+                    style="@style/NumpadKey"
+                    android:text="7" />
+
+                <Button
+                    android:id="@+id/btnNum8"
+                    style="@style/NumpadKey"
+                    android:text="8" />
+
+                <Button
+                    android:id="@+id/btnNum9"
+                    style="@style/NumpadKey"
+                    android:text="9" />
+            </LinearLayout>
+
+            <!-- Row 4: DEL 0 GO -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnNumDel"
+                    style="@style/NumpadKey"
+                    android:text="@string/numpad_del"
+                    android:textColor="@color/text_error"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/btnNum0"
+                    style="@style/NumpadKey"
+                    android:text="0" />
+
+                <Button
+                    android:id="@+id/btnNumGo"
+                    style="@style/NumpadKey"
+                    android:text="@string/numpad_go"
+                    android:textColor="@color/accent_green"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <!-- Hint -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:text="@string/numpad_hint"
+                android:textColor="@color/text_hint"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </FrameLayout>
+
 </FrameLayout>

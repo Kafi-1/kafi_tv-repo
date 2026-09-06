@@ -9,7 +9,13 @@
       "Bash(pkg install *)",
       "Bash(apt-get update *)",
       "Bash(java *)",
-      "Bash(chmod +x gradlew)"
+      "Bash(chmod +x gradlew)",
+      "Bash(command -v aapt)",
+      "Read(//data/data/com.termux/files/home/**)",
+      "Bash(command -v git)",
+      "Bash(command -v gh)",
+      "Bash(gh --version)",
+      "Bash(command -v curl)"
     ]
   }
 }

@@ -75,23 +75,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Notice Marquee -->
-        <TextView
-            android:id="@+id/tvNotice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#33E50914"
-            android:padding="8dp"
-            android:textSize="@dimen/text_sm"
-            android:textStyle="bold"
-            android:textColor="@color/text_error"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:visibility="gone" />
-
         <!-- Offline Banner -->
         <LinearLayout
             android:id="@+id/offlineBanner"

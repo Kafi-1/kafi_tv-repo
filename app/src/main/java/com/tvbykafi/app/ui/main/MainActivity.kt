@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var tvExpiryTimer: TextView
-    private lateinit var tvNotice: TextView
     private lateinit var offlineBanner: LinearLayout
     private var currentFragmentTag: String? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
@@ -55,7 +54,6 @@ class MainActivity : AppCompatActivity() {
 
         drawerLayout = findViewById(R.id.drawerLayout)
         tvExpiryTimer = findViewById(R.id.tvExpiryTimer)
-        tvNotice = findViewById(R.id.tvNotice)
         offlineBanner = findViewById(R.id.offlineBanner)
 
         setupNavigation()
@@ -166,8 +164,6 @@ class MainActivity : AppCompatActivity() {
         configListener = repo.observeAppConfig { config ->
             appConfig = config
             if (!isFinishing && !isDestroyed) {
-                runOnUiThread { updateConfigUI(config) }
-
                 val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
                 if (currentFragment is ConfigUpdateListener && currentFragment.isAdded) {
                     runOnUiThread { currentFragment.onConfigUpdated(config) }
@@ -196,16 +192,6 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             tvExpiryTimer.text = getString(R.string.no_limit)
-        }
-    }
-
-    private fun updateConfigUI(config: AppConfig) {
-        if (config.live_notice.isNotEmpty()) {
-            tvNotice.visibility = View.VISIBLE
-            tvNotice.text = config.live_notice
-            tvNotice.isSelected = true
-        } else {
-            tvNotice.visibility = View.GONE
         }
     }
 

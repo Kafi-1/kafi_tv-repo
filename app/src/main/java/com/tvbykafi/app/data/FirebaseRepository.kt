@@ -7,6 +7,10 @@ import com.tvbykafi.app.data.model.AppConfig
 import com.tvbykafi.app.data.model.Channel
 import com.tvbykafi.app.data.model.PaymentRequest
 import com.tvbykafi.app.data.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class FirebaseRepository private constructor() {
 
@@ -23,20 +27,43 @@ class FirebaseRepository private constructor() {
 
     private val db = FirebaseFirestore.getInstance()
     private val usersCol = db.collection("users")
-    private val channelsCol = db.collection("channels")
-    private val categoriesCol = db.collection("categories")
     private val settingsDoc = db.document("settings/app_config")
     private val paymentCol = db.collection("payment_requests")
 
-    private var cachedChannels: List<Channel>? = null
-    private var cachedCategories: List<String>? = null
-    private var channelsCacheTime = 0L
-    private val cacheTtl = 5 * 60 * 1000L
+    private val playlistRepo = PlaylistRepository.getInstance()
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    // =================== CHANNELS (M3U playlist) ===================
+
+    fun fetchChannels(
+        onSuccess: (List<Channel>) -> Unit,
+        onError: () -> Unit = {}
+    ) {
+        scope.launch {
+            try {
+                onSuccess(playlistRepo.fetchPlaylist())
+            } catch (_: Exception) {
+                onError()
+            }
+        }
+    }
+
+    fun fetchCategories(
+        onSuccess: (List<String>) -> Unit,
+        onError: () -> Unit = {}
+    ) {
+        scope.launch {
+            try {
+                val channels = playlistRepo.fetchPlaylist()
+                onSuccess(channels.map { it.category }.distinct().sorted())
+            } catch (_: Exception) {
+                onError()
+            }
+        }
+    }
 
     fun clearCache() {
-        cachedChannels = null
-        cachedCategories = null
-        channelsCacheTime = 0L
+        playlistRepo.clearCache()
     }
 
     // =================== AUTH ===================
@@ -122,89 +149,6 @@ class FirebaseRepository private constructor() {
         }
     }
 
-    // =================== CHANNELS (One-time fetch — optimized) ===================
-
-    fun fetchChannels(
-        onSuccess: (List<Channel>) -> Unit,
-        onError: () -> Unit = {}
-    ) {
-        val now = System.currentTimeMillis()
-        val cached = cachedChannels
-        if (cached != null && (now - channelsCacheTime) < cacheTtl) {
-            onSuccess(cached)
-            return
-        }
-        channelsCol.get()
-            .addOnSuccessListener { snap ->
-                val list = snap.documents.mapNotNull { doc ->
-                    val d = doc.data ?: return@mapNotNull null
-                    Channel(
-                        id = doc.id,
-                        name = d["name"] as? String ?: "",
-                        logo = d["logo"] as? String ?: "",
-                        url = d["url"] as? String ?: "",
-                        category = d["category"] as? String ?: "General",
-                        status = d["status"] as? String ?: "live",
-                        drmLicenseUrl = d["drm_license_url"] as? String ?: ""
-                    )
-                }
-                cachedChannels = list
-                channelsCacheTime = System.currentTimeMillis()
-                onSuccess(list)
-            }
-            .addOnFailureListener { onError() }
-    }
-
-    // Keep realtime version for backward compatibility if needed
-    fun observeChannels(onUpdate: (List<Channel>) -> Unit): ListenerRegistration {
-        return channelsCol.addSnapshotListener { snap, _ ->
-            if (snap == null) return@addSnapshotListener
-            val list = snap.documents.mapNotNull { doc ->
-                val d = doc.data ?: return@mapNotNull null
-                Channel(
-                    id = doc.id,
-                    name = d["name"] as? String ?: "",
-                    logo = d["logo"] as? String ?: "",
-                    url = d["url"] as? String ?: "",
-                    category = d["category"] as? String ?: "General",
-                    status = d["status"] as? String ?: "live",
-                    drmLicenseUrl = d["drm_license_url"] as? String ?: ""
-                )
-            }
-            onUpdate(list)
-        }
-    }
-
-    // =================== CATEGORIES (One-time fetch — optimized) ===================
-
-    fun fetchCategories(
-        onSuccess: (List<String>) -> Unit,
-        onError: () -> Unit = {}
-    ) {
-        val cached = cachedCategories
-        val now = System.currentTimeMillis()
-        if (cached != null && (now - channelsCacheTime) < cacheTtl) {
-            onSuccess(cached)
-            return
-        }
-        categoriesCol.get()
-            .addOnSuccessListener { snap ->
-                val cats = snap.documents.mapNotNull { it.data?.get("name") as? String }
-                cachedCategories = cats
-                onSuccess(cats)
-            }
-            .addOnFailureListener { onError() }
-    }
-
-    // Keep realtime version for backward compatibility
-    fun observeCategories(onUpdate: (List<String>) -> Unit): ListenerRegistration {
-        return categoriesCol.addSnapshotListener { snap, _ ->
-            if (snap == null) return@addSnapshotListener
-            val cats = snap.documents.mapNotNull { it.data?.get("name") as? String }
-            onUpdate(cats)
-        }
-    }
-
     // =================== APP SETTINGS REALTIME ===================
 
     fun observeAppConfig(onUpdate: (AppConfig) -> Unit): ListenerRegistration {
@@ -214,7 +158,6 @@ class FirebaseRepository private constructor() {
             onUpdate(AppConfig(
                 monthly_price = d["monthly_price"] as? String ?: "",
                 expire_message = d["expire_message"] as? String ?: "",
-                live_notice = d["live_notice"] as? String ?: "",
                 support_whatsapp = d["support_whatsapp"] as? String ?: "",
                 support_telegram = d["support_telegram"] as? String ?: "",
                 support_email = d["support_email"] as? String ?: "",
