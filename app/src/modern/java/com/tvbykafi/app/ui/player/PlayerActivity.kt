@@ -19,6 +19,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -161,7 +162,7 @@ class PlayerActivity : AppCompatActivity() {
     private val expiryFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
     // Network monitor
-    private var networkCallback: android.net.ConnectivityManager.NetworkCallback? = null
+    private var networkMonitor: NetworkUtil.NetworkMonitor? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -635,7 +636,10 @@ class PlayerActivity : AppCompatActivity() {
 
             val isExpired = isSubscriptionExpired()
             tvSettingsExpiry.setTextColor(
-                getColor(if (isExpired) R.color.status_expired else R.color.accent_green)
+                ContextCompat.getColor(
+                    this,
+                    if (isExpired) R.color.status_expired else R.color.accent_green
+                )
             )
         }
         settingsOverlay.visibility = View.VISIBLE
@@ -835,7 +839,7 @@ class PlayerActivity : AppCompatActivity() {
     // =================== NETWORK MONITOR ===================
 
     private fun startNetworkMonitor() {
-        networkCallback = NetworkUtil.registerCallback(
+        networkMonitor = NetworkUtil.NetworkMonitor.start(
             this,
             onAvailable = {
                 runOnUiThread {
@@ -1054,7 +1058,7 @@ class PlayerActivity : AppCompatActivity() {
         retryHandler.removeCallbacksAndMessages(null)
         infoHandler.removeCallbacksAndMessages(null)
         userListener?.remove()
-        networkCallback?.let { NetworkUtil.unregisterCallback(this, it) }
+        networkMonitor?.stop(this)
         releasePlayer()
         super.onDestroy()
     }

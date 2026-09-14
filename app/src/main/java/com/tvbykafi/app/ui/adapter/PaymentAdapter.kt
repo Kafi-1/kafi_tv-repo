@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,15 +38,15 @@ class PaymentAdapter : ListAdapter<PaymentRequest, PaymentAdapter.VH>(DIFF) {
         val ctx = holder.itemView.context
         when (item.status.lowercase()) {
             "approved" -> {
-                holder.tvStatus.setTextColor(ctx.getColor(R.color.accent_green))
+                holder.tvStatus.setTextColor(ContextCompat.getColor(ctx, R.color.accent_green))
                 holder.statusDot.setBackgroundResource(R.drawable.bg_dot_green)
             }
             "rejected" -> {
-                holder.tvStatus.setTextColor(ctx.getColor(R.color.text_error))
+                holder.tvStatus.setTextColor(ContextCompat.getColor(ctx, R.color.text_error))
                 holder.statusDot.setBackgroundResource(R.drawable.bg_dot_red)
             }
             else -> {
-                holder.tvStatus.setTextColor(ctx.getColor(R.color.accent_orange))
+                holder.tvStatus.setTextColor(ContextCompat.getColor(ctx, R.color.accent_orange))
                 holder.statusDot.setBackgroundResource(R.drawable.bg_dot_orange)
             }
         }

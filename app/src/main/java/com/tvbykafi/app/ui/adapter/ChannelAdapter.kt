@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -80,10 +81,10 @@ class ChannelAdapter(
             )
             if (hasFocus) {
                 v.animate().scaleX(1.15f).scaleY(1.15f).setDuration(200).start()
-                holder.tvName.setTextColor(v.context.getColor(R.color.text_primary))
+                holder.tvName.setTextColor(ContextCompat.getColor(v.context, R.color.text_primary))
             } else {
                 v.animate().scaleX(1f).scaleY(1f).setDuration(200).start()
-                holder.tvName.setTextColor(v.context.getColor(R.color.text_secondary))
+                holder.tvName.setTextColor(ContextCompat.getColor(v.context, R.color.text_secondary))
             }
         }
     }

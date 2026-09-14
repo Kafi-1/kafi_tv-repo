@@ -2,6 +2,9 @@ package com.tvbykafi.app
 
 import android.app.Application
 import android.content.Context
+import android.net.HttpsURLConnection
+import android.os.Build
+import androidx.multidex.MultiDex
 import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.load.DecodeFormat
@@ -12,13 +15,36 @@ import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseApp
 import com.tvbykafi.app.util.DeviceUtils
+import java.security.SSLContext
 
 class App : Application() {
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        // API 19 (KitKat) e 64K+ method er app manually multidex install korte hoy
+        MultiDex.install(this)
+    }
+
     override fun onCreate() {
         super.onCreate()
+        enableTls12OnPreLollipop()
         try {
             FirebaseApp.initializeApp(this)
         } catch (_: Exception) {
+        }
+    }
+
+    // Android 4.4 e TLS 1.2 default enabled thake na — GitHub/Firebase er HTTPS
+    // er jonno default SSL socket factory ke TLSv1.2 e set kora hoy.
+    // Certificate validation unchanged — security weak kora hoy na.
+    private fun enableTls12OnPreLollipop() {
+        if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 22) {
+            try {
+                val sc = SSLContext.getInstance("TLSv1.2")
+                sc.init(null, null, null)
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.socketFactory)
+            } catch (_: Exception) {
+            }
         }
     }
 

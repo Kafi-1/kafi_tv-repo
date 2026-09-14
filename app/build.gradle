@@ -10,9 +10,24 @@ android {
     namespace 'com.tvbykafi.app'
     compileSdk 34
 
+    // Legacy flavor = Android 4.4.4 / API 19 TV support (ExoPlayer 2.x)
+    // Modern flavor = current production build (Media3), unchanged
+    flavorDimensions "api"
+    productFlavors {
+        modern {
+            dimension "api"
+            minSdk 21
+        }
+        legacy {
+            dimension "api"
+            minSdk 19
+            versionNameSuffix "-legacy"
+            proguardFile 'proguard-legacy.pro'
+        }
+    }
+
     defaultConfig {
         applicationId "com.tvbykafi.app"
-        minSdk 21
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -30,7 +45,7 @@ android {
                 storePassword System.getenv("KEYSTORE_PASSWORD")
                 keyAlias System.getenv("KEY_ALIAS")
                 keyPassword System.getenv("KEY_PASSWORD")
-                // v1 = purono Android TV box (5-6), v2 = notun box
+                // v1 = purono Android TV box (4.4/5-6), v2 = notun box
                 enableV1Signing true
                 enableV2Signing true
             }
@@ -52,6 +67,18 @@ android {
         }
         debug {
             minifyEnabled false
+        }
+    }
+
+    // Legacy APK er naam alada kore dile jate TV te install korar somoy
+    // modern build er sathe confusion na hoy
+    applicationVariants.all { variant ->
+        if (variant.flavorName == "legacy") {
+            variant.outputs.all { output ->
+                outputFileName = variant.buildType.name == "release"
+                        ? "Kafi TV Legacy.apk"
+                        : "Kafi TV Legacy-debug.apk"
+            }
         }
     }
 
@@ -84,12 +111,22 @@ dependencies {
     // Material Design
     implementation 'com.google.android.material:material:1.11.0'
 
-    // ExoPlayer (Media3)
-    implementation 'androidx.media3:media3-exoplayer:1.2.1'
-    implementation 'androidx.media3:media3-exoplayer-hls:1.2.1'
-    implementation 'androidx.media3:media3-exoplayer-dash:1.2.1'
-    implementation 'androidx.media3:media3-exoplayer-rtsp:1.2.1'
-    implementation 'androidx.media3:media3-ui:1.2.1'
+    // Multidex (API 19 e legacy multidex lagbe)
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // ExoPlayer — Modern flavor (Media3, API 21+)
+    modernImplementation 'androidx.media3:media3-exoplayer:1.2.1'
+    modernImplementation 'androidx.media3:media3-exoplayer-hls:1.2.1'
+    modernImplementation 'androidx.media3:media3-exoplayer-dash:1.2.1'
+    modernImplementation 'androidx.media3:media3-exoplayer-rtsp:1.2.1'
+    modernImplementation 'androidx.media3:media3-ui:1.2.1'
+
+    // ExoPlayer 2.x — Legacy flavor (Android 4.4 / API 19 compatible, minSdk 16)
+    legacyImplementation 'com.google.android.exoplayer:exoplayer-core:2.19.1'
+    legacyImplementation 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
+    legacyImplementation 'com.google.android.exoplayer:exoplayer-dash:2.19.1'
+    legacyImplementation 'com.google.android.exoplayer:exoplayer-rtsp:2.19.1'
+    legacyImplementation 'com.google.android.exoplayer:exoplayer-ui:2.19.1'
 
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:32.7.1')

@@ -1,13 +1,13 @@
 package com.tvbykafi.app.ui.main
 
 import android.content.Intent
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.firebase.firestore.ListenerRegistration
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvExpiryTimer: TextView
     private lateinit var offlineBanner: LinearLayout
     private var currentFragmentTag: String? = null
-    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var networkMonitor: NetworkUtil.NetworkMonitor? = null
 
     private val expiryFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
     private val displayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
@@ -185,7 +185,10 @@ class MainActivity : AppCompatActivity() {
 
                 val isExpired = end != null && Date().after(end)
                 tvExpiryTimer.setTextColor(
-                    getColor(if (isExpired) R.color.status_expired else R.color.status_active)
+                    ContextCompat.getColor(
+                        this,
+                        if (isExpired) R.color.status_expired else R.color.status_active
+                    )
                 )
             } catch (_: Exception) {
                 tvExpiryTimer.text = user.expiry
@@ -247,7 +250,7 @@ class MainActivity : AppCompatActivity() {
         if (!NetworkUtil.isOnline(this)) {
             offlineBanner.visibility = View.VISIBLE
         }
-        networkCallback = NetworkUtil.registerCallback(
+        networkMonitor = NetworkUtil.NetworkMonitor.start(
             this,
             onAvailable = {
                 runOnUiThread { offlineBanner.visibility = View.GONE }
@@ -262,7 +265,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         userListener?.remove()
         configListener?.remove()
-        networkCallback?.let { NetworkUtil.unregisterCallback(this, it) }
+        networkMonitor?.stop(this)
     }
 
     interface UserUpdateListener {

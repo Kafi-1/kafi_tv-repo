@@ -32,25 +32,36 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Build Modern Debug APK
+        run: ./gradlew assembleModernDebug --no-daemon --stacktrace
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+      - name: Build Modern Release APK
+        run: ./gradlew assembleModernRelease --no-daemon --stacktrace
         continue-on-error: true
 
-      - name: Upload Debug APK
+      - name: Build Legacy Release APK (Android 4.4 / API 19)
+        run: ./gradlew assembleLegacyRelease --no-daemon --stacktrace
+
+      - name: Upload Modern Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: TVbyKafi-debug
-          path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
-
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: TVbyKafi-release
-          path: app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/modern/debug/*.apk
           retention-days: 30
           if-no-files-found: ignore
+
+      - name: Upload Modern Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TVbyKafi-release
+          path: app/build/outputs/apk/modern/release/*.apk
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload Kafi TV Legacy APK (Android 4.4)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kafi-TV-Legacy
+          path: app/build/outputs/apk/legacy/release/*.apk
+          retention-days: 30
+          if-no-files-found: error

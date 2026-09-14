@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.tvbykafi.app.R
@@ -47,7 +48,7 @@ class CategoryAdapter(
             if (isActive) R.drawable.bg_chip_active else R.drawable.bg_chip
         )
         holder.tvName.setTextColor(
-            holder.itemView.context.getColor(
+            ContextCompat.getColor(holder.itemView.context, 
                 if (isActive) R.color.text_primary else R.color.text_secondary
             )
         )

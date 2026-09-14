@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -53,11 +54,11 @@ class PlaylistAdapter(
         holder.playingIndicator.visibility = if (isPlaying) View.VISIBLE else View.GONE
 
         if (isPlaying) {
-            holder.tvName.setTextColor(holder.itemView.context.getColor(R.color.primary))
-            holder.tvChno.setTextColor(holder.itemView.context.getColor(R.color.primary))
+            holder.tvName.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.primary))
+            holder.tvChno.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.primary))
         } else {
-            holder.tvName.setTextColor(holder.itemView.context.getColor(R.color.text_primary))
-            holder.tvChno.setTextColor(holder.itemView.context.getColor(R.color.text_secondary))
+            holder.tvName.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.text_primary))
+            holder.tvChno.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.text_secondary))
         }
 
         Glide.with(holder.ivLogo.context)
@@ -75,7 +76,7 @@ class PlaylistAdapter(
 
         holder.itemView.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
-                v.setBackgroundColor(v.context.getColor(R.color.bg_card_elevated))
+                v.setBackgroundColor(ContextCompat.getColor(v.context, R.color.bg_card_elevated))
                 v.animate().scaleX(1.02f).scaleY(1.02f).setDuration(150).start()
             } else {
                 v.setBackgroundColor(0x00000000)
