@@ -33,7 +33,7 @@
             android:id="@+id/ivChannelLogoOverlay"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            app:srcCompat="@drawable/ic_tv_default"
+            android:src="@drawable/ic_tv_default"
             android:contentDescription="Channel Logo" />
 
         <LinearLayout
