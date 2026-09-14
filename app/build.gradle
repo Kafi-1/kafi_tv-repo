@@ -122,11 +122,9 @@ dependencies {
     modernImplementation 'androidx.media3:media3-ui:1.2.1'
 
     // ExoPlayer 2.x — Legacy flavor (Android 4.4 / API 19 compatible, minSdk 16)
-    legacyImplementation 'com.google.android.exoplayer:exoplayer-core:2.19.1'
-    legacyImplementation 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
-    legacyImplementation 'com.google.android.exoplayer:exoplayer-dash:2.19.1'
-    legacyImplementation 'com.google.android.exoplayer:exoplayer-rtsp:2.19.1'
-    legacyImplementation 'com.google.android.exoplayer:exoplayer-ui:2.19.1'
+    // 2.19.1 e module split (common/datasource/decoder/extractor alada artifact),
+    // tai aggregate "exoplayer" artifact use kora hoyeche — sob module ei ek packet e
+    legacyImplementation 'com.google.android.exoplayer:exoplayer:2.19.1'
 
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:32.7.1')
