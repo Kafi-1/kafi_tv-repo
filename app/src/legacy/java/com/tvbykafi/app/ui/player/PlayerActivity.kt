@@ -26,9 +26,9 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 
-import com.google.android.exoplayer2.datasource.DefaultDataSource
-import com.google.android.exoplayer2.datasource.DefaultHttpDataSource
-import com.google.android.exoplayer2.exoplayer.DefaultLoadControl
+import com.google.android.exoplayer2.upstream.DefaultDataSource
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
