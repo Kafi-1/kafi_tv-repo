@@ -35,16 +35,18 @@ object NetworkUtil {
         private var receiver: BroadcastReceiver? = null
 
         fun stop(ctx: Context) {
-            if (callback != null) {
+            val cb = callback
+            if (cb != null) {
                 try {
                     val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                    cm.unregisterNetworkCallback(callback)
+                    cm.unregisterNetworkCallback(cb)
                 } catch (_: Exception) {}
                 callback = null
             }
-            if (receiver != null) {
+            val rv = receiver
+            if (rv != null) {
                 try {
-                    ctx.unregisterReceiver(receiver)
+                    ctx.unregisterReceiver(rv)
                 } catch (_: Exception) {}
                 receiver = null
             }

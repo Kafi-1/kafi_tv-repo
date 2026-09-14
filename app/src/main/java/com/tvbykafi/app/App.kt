@@ -2,7 +2,6 @@ package com.tvbykafi.app
 
 import android.app.Application
 import android.content.Context
-import android.net.HttpsURLConnection
 import android.os.Build
 import androidx.multidex.MultiDex
 import com.bumptech.glide.Glide
@@ -15,7 +14,8 @@ import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseApp
 import com.tvbykafi.app.util.DeviceUtils
-import java.security.SSLContext
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
 
 class App : Application() {
 
