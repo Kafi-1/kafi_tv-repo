@@ -1,10 +1,17 @@
 package com.tvbykafi.app.data
 
+import android.os.Build
 import com.tvbykafi.app.data.model.Channel
+import com.tvbykafi.app.util.DnsCompat
+import com.tvbykafi.app.util.SslCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.Dns
+import okhttp3.OkHttpClient
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.UnknownHostException
+import java.util.concurrent.TimeUnit
 
 class PlaylistRepository private constructor() {
 
@@ -20,6 +27,28 @@ class PlaylistRepository private constructor() {
                 instance ?: PlaylistRepository().also { instance = it }
             }
         }
+    }
+
+    // Purona TV gulo IPv6 address e connect kore fail kore (ENETUNREACH —
+    // network e IPv6 route nai). OkHttp + custom DNS diye IPv4-first
+    // resolve kora hoy, ar KitKat e TLS 1.2 + bundled root CA o ensure hoy.
+    private val httpClient: OkHttpClient by lazy {
+        val builder = OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .followRedirects(true)
+            .dns { host ->
+                val addrs = DnsCompat.resolveIPv4First(host)
+                if (addrs.isEmpty()) throw UnknownHostException(host)
+                addrs
+            }
+        if (Build.VERSION.SDK_INT < 24) {
+            try {
+                builder.sslSocketFactory(SslCompat.socketFactory(), SslCompat.trustManager())
+            } catch (_: Exception) {
+            }
+        }
+        builder.build()
     }
 
     private var cachedChannels: List<Channel>? = null
@@ -46,15 +75,16 @@ class PlaylistRepository private constructor() {
     }
 
     private fun downloadContent(urlString: String): String {
-        val url = URL(urlString)
-        val connection = url.openConnection() as HttpURLConnection
-        connection.connectTimeout = 15000
-        connection.readTimeout = 15000
-        connection.setRequestProperty("User-Agent", "TVbyKafi/2.0")
-        try {
-            return connection.inputStream.bufferedReader().readText()
-        } finally {
-            connection.disconnect()
+        val request = okhttp3.Request.Builder()
+            .url(urlString)
+            .header("User-Agent", "TVbyKafi/2.0")
+            .build()
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw java.io.IOException("HTTP ${response.code} loading playlist")
+            }
+            return response.body()?.string()
+                ?: throw java.io.IOException("Empty response body")
         }
     }
 
