@@ -5,6 +5,7 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
@@ -250,6 +251,7 @@ class PlayerActivity : AppCompatActivity() {
                     playChannel(startIndex)
                 }
             } catch (e: Exception) {
+                Log.e("KafiTV", "Playlist load failed", e)
                 runOnUiThread {
                     if (allChannels.isEmpty()) {
                         showError(getString(R.string.error_load_playlist))

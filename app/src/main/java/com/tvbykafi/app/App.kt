@@ -14,8 +14,14 @@ import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseApp
 import com.tvbykafi.app.util.DeviceUtils
+import java.security.KeyStore
+import java.security.cert.CertificateException
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 
 class App : Application() {
 
@@ -27,24 +33,67 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        enableTls12OnPreLollipop()
+        enableLegacySslCompat()
         try {
             FirebaseApp.initializeApp(this)
         } catch (_: Exception) {
         }
     }
 
-    // Android 4.4 e TLS 1.2 default enabled thake na — GitHub/Firebase er HTTPS
-    // er jonno default SSL socket factory ke TLSv1.2 e set kora hoy.
-    // Certificate validation unchanged — security weak kora hoy na.
-    private fun enableTls12OnPreLollipop() {
-        if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 22) {
-            try {
-                val sc = SSLContext.getInstance("TLSv1.2")
-                sc.init(null, null, null)
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.socketFactory)
-            } catch (_: Exception) {
+    // Android 7.0 (API 24) er age device gulo (4.4 TV etc.) er trust store e
+    // notun root CA gulo nai — ISRG Root X1 (Let's Encrypt, GitHub raw er chain)
+    // ar Amazon Root CA 1 (channel logo host). ISRG Root X1 2015 e toiri,
+    // KitKat er store 2013-er. Root cert gulo embed kore system roots er sathe
+    // ADD kora hoy — certificate validation unchanged, security weak hoy na.
+    // network_security_config API 24+ e kaj kore, tai ei manual path lagbe.
+    private fun enableLegacySslCompat() {
+        if (Build.VERSION.SDK_INT >= 24) return
+        try {
+            val trustManager = buildCompositeTrustManager()
+            val sc = SSLContext.getInstance("TLSv1.2")
+            sc.init(null, arrayOf(trustManager), null)
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.socketFactory)
+        } catch (_: Exception) {
+        }
+    }
+
+    // System default trust manager + bundled root CA — jekono ekta trust korlei OK.
+    // Hostname verification default HttpsURLConnection er — untouched.
+    private fun buildCompositeTrustManager(): X509TrustManager {
+        val systemTmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        systemTmf.init(null as KeyStore?)
+        val systemTm = systemTmf.trustManagers.filterIsInstance<X509TrustManager>().first()
+
+        val bundledCerts = listOf(R.raw.isrgrootx1, R.raw.amazonrootca1)
+        val ks = KeyStore.getInstance(KeyStore.getDefaultType())
+        ks.load(null)
+        val cf = CertificateFactory.getInstance("X.509")
+        bundledCerts.forEach { resId ->
+            resources.openRawResource(resId).use { ins ->
+                ks.setCertificateEntry("bundled_ca_$resId", cf.generateCertificate(ins))
             }
+        }
+        val bundledTmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        bundledTmf.init(ks)
+        val bundledTm = bundledTmf.trustManagers.filterIsInstance<X509TrustManager>().first()
+
+        return object : X509TrustManager {
+            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
+                systemTm.checkClientTrusted(chain, authType)
+            }
+            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
+                try {
+                    systemTm.checkServerTrusted(chain, authType)
+                } catch (e: CertificateException) {
+                    try {
+                        bundledTm.checkServerTrusted(chain, authType)
+                    } catch (_: CertificateException) {
+                        throw e
+                    }
+                }
+            }
+            override fun getAcceptedIssuers(): Array<X509Certificate> =
+                systemTm.acceptedIssuers + bundledTm.acceptedIssuers
         }
     }
 
