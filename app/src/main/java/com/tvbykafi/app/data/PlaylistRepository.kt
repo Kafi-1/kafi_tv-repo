@@ -81,7 +81,7 @@ class PlaylistRepository private constructor() {
             .build()
         httpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                throw java.io.IOException("HTTP ${response.code} loading playlist")
+                throw java.io.IOException("HTTP ${response.code()} loading playlist")
             }
             return response.body()?.string()
                 ?: throw java.io.IOException("Empty response body")
