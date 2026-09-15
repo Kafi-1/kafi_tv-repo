@@ -253,7 +253,8 @@ class PlayerActivity : AppCompatActivity() {
                 Log.e("KafiTV", "Playlist load failed", e)
                 runOnUiThread {
                     if (allChannels.isEmpty()) {
-                        showError(getString(R.string.error_load_playlist))
+                        val reason = e.message ?: e.javaClass.simpleName
+                        showError(getString(R.string.error_load_playlist) + "\n[" + reason + "]")
                     }
                 }
             }

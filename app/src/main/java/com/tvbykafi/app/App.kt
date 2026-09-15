@@ -14,12 +14,17 @@ import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseApp
 import com.tvbykafi.app.util.DeviceUtils
+import java.io.IOException
+import java.net.InetAddress
+import java.net.Socket
 import java.security.KeyStore
 import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
@@ -52,7 +57,11 @@ class App : Application() {
             val trustManager = buildCompositeTrustManager()
             val sc = SSLContext.getInstance("TLSv1.2")
             sc.init(null, arrayOf(trustManager), null)
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.socketFactory)
+            // KitKat bug: "TLSv1.2" SSLContext theke banano socket er enabled
+            // protocol default e TLSv1 thake — server (GitHub) TLS 1.0/1.1 reject
+            // kore tai handshake fail kore. Prottekhta socket e TLSv1.2 force
+            // korte wrapped factory lagbe (Google er official KitKat workaround).
+            HttpsURLConnection.setDefaultSSLSocketFactory(Tls12SocketFactory(sc.socketFactory))
         } catch (_: Exception) {
         }
     }
@@ -94,6 +103,34 @@ class App : Application() {
             }
             override fun getAcceptedIssuers(): Array<X509Certificate> =
                 systemTm.acceptedIssuers + bundledTm.acceptedIssuers
+        }
+    }
+
+    // KitKat e SSLContext("TLSv1.2") er socket gulo default e TLSv1 dia handshake
+    // kore — ei wrapper prottekhta socket e TLSv1.2 enable kore dey.
+    private class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFactory() {
+
+        override fun getDefaultCipherSuites(): Array<String> = delegate.defaultCipherSuites
+        override fun getSupportedCipherSuites(): Array<String> = delegate.supportedCipherSuites
+
+        override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket =
+            patch(delegate.createSocket(s, host, port, autoClose) as SSLSocket)
+
+        override fun createSocket(host: String, port: Int): Socket =
+            patch(delegate.createSocket(host, port) as SSLSocket)
+
+        override fun createSocket(host: String, port: Int, localHost: InetAddress, localPort: Int): Socket =
+            patch(delegate.createSocket(host, port, localHost, localPort) as SSLSocket)
+
+        override fun createSocket(host: InetAddress, port: Int): Socket =
+            patch(delegate.createSocket(host, port) as SSLSocket)
+
+        override fun createSocket(address: InetAddress, port: Int, localAddress: InetAddress, localPort: Int): Socket =
+            patch(delegate.createSocket(address, port, localAddress, localPort) as SSLSocket)
+
+        private fun patch(socket: SSLSocket): SSLSocket {
+            socket.enabledProtocols = arrayOf("TLSv1.2")
+            return socket
         }
     }
 
